@@ -1,0 +1,2 @@
+C:\Users\user\source\repos\BroadcastHintsExtension\BroadcastHintsExtension\obj\x64\Debug\BroadcastHintsExtension.csproj.AssemblyReference.cache
+C:\Users\user\source\repos\BroadcastHintsExtension\BroadcastHintsExtension\obj\x64\Debug\BroadcastHintsExtension.csproj.CoreCompileInputs.cache
