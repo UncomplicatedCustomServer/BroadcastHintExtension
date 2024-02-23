@@ -1,4 +1,4 @@
-using BroadcastHintExtension.Elements;
+﻿using BroadcastHintExtension.Elements;
 using Exiled.API.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;

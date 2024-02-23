@@ -1,62 +1,58 @@
 ﻿using BroadcastHintExtension.Structures;
 using Exiled.API.Features;
-using Exiled.Events.EventArgs.Interfaces;
-using Exiled.Events.EventArgs.Player;
-using MEC;
-using PluginAPI.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UncomplicatedCustomRoles.API.Features;
-using UnityEngine.UI;
+using UncomplicatedCustomRoles.Structures;
 
 namespace BroadcastHintExtension
 {
     internal class EventHandler
     {
-        public void OnSpawned(SpawnedEventArgs Spawning)
+        public ICustomRoleEvent OnSpawned(ICustomRoleEvent Spawning)
         {
-            Timing.CallDelayed(0.5f, () =>
-            {
-                CallEvent(CustomRoleEvent.OnSpawned, Spawning);
-            });
+            CallEvent(CustomRoleEvent.OnSpawned, Spawning);
+            return Spawning;
         }
 
-        public void OnDying(DyingEventArgs Dying)
+        public ICustomRoleEvent OnDying(ICustomRoleEvent Dying)
         {
             CallEvent(CustomRoleEvent.OnDied, Dying);
+            return Dying;
         }
 
-        public void OnDamage(HurtEventArgs Hurted)
-        {
-            CallEvent(CustomRoleEvent.OnDamaged, Hurted);
-        }
-
-        public void OnDamaging(HurtingEventArgs Damage)
+        public ICustomRoleEvent OnDamaging(ICustomRoleEvent Damage)
         {
             CallEvent(CustomRoleEvent.OnDamaging, Damage);
+            return Damage;
         }
 
-        public void OnInteractingDoor(InteractingDoorEventArgs Interaction)
-        {
-            CallEvent(CustomRoleEvent.OnInteractingDoor, Interaction);
-        }
-
-        public void OnInteractingElevator(InteractingElevatorEventArgs Interaction)
+        public ICustomRoleEvent OnInteractingElevator(ICustomRoleEvent Interaction)
         {
             CallEvent(CustomRoleEvent.OnInteractingElevator, Interaction);
+            return Interaction;
         }
 
-        public void CallEvent(CustomRoleEvent Event, IPlayerEvent BaseEvent)
+        public ICustomRoleEvent OnWarheadActivation(ICustomRoleEvent Activation)
         {
-            CallEvent(Event, BaseEvent.Player);
+            CallEvent(CustomRoleEvent.OnWarheadActivation, Activation);
+            return Activation;
         }
 
-        public void CallEvent(CustomRoleEvent Event, Player Player)
+        public ICustomRoleEvent OnGeneratorActivation(ICustomRoleEvent Generator)
         {
-            if (Manager.HasCustomRole(Player) && Plugin.Istance.Config.Events.ContainsKey(Manager.Get(Player).Id) && Plugin.Istance.Config.Events[Manager.Get(Player).Id].ContainsKey(Event))
+            CallEvent(CustomRoleEvent.OnGenerationActivation, Generator);
+            return Generator;
+        }
+
+        public ICustomRoleEvent OnGeneratorDeactivation(ICustomRoleEvent Generator)
+        {
+            CallEvent(CustomRoleEvent.OnGenerationDeactivation, Generator);
+            return Generator;
+        }
+
+        public void CallEvent(CustomRoleEvent Event, ICustomRoleEvent BaseEvent)
+        {
+            Player Player = BaseEvent.Player;
+            if (Plugin.Istance.Config.Events.ContainsKey(Manager.Get(Player).Id) && Plugin.Istance.Config.Events[BaseEvent.Role.Id].ContainsKey(Event))
             {
                 IBroadcastHint EventBase = Plugin.Istance.Config.Events[Manager.Get(Player).Id][Event];
                 if (EventBase.BroadcastDuration > 0 && EventBase.BroadcastContent != string.Empty)

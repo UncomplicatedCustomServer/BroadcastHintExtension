@@ -2,8 +2,10 @@
 {
     OnSpawned,
     OnDied,
-    OnDamaged,
     OnDamaging,
     OnInteractingDoor,
-    OnInteractingElevator
+    OnInteractingElevator,
+    OnWarheadActivation,
+    OnGenerationActivation,
+    OnGenerationDeactivation
 }
