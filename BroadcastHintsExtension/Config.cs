@@ -12,11 +12,11 @@ namespace BroadcastHintExtension
         [Description("Do enable the debug (developer) mode?")]
         public bool Debug { get; set; } = false;
         [Description("A list of all events")]
-        public Dictionary<int, Dictionary<CustomRoleEvent, BroadcastHint>> Events { get; set; } = new()
+        public Dictionary<int, Dictionary<UCREvents, BroadcastHint>> Events { get; set; } = new()
         {
             { 1, new()
                 {
-                    { CustomRoleEvent.OnDied, new() }
+                    { UCREvents.Dying, new() }
                 }
             }
         };

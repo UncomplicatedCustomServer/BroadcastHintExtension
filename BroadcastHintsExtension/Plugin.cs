@@ -1,8 +1,10 @@
-﻿using Exiled.API.Features;
+﻿using BroadcastHintExtension.Elements;
+using BroadcastHintExtension.Structures;
+using Exiled.API.Features;
 using System;
+using System.Collections.Generic;
+using UncomplicatedCustomRoles.API.Features;
 using UncomplicatedCustomRoles.Structures;
-using Handler = BroadcastHintExtension.EventHandler;
-using PlayerHandler = Exiled.Events.Handlers.Player;
 
 namespace BroadcastHintExtension
 {
@@ -14,44 +16,58 @@ namespace BroadcastHintExtension
         public override Version Version => new(0, 8, 0);
         public override Version RequiredExiledVersion => new(8, 8, 0);
         public static Plugin Istance;
-        internal Handler Handler;
         public override void OnEnabled()
         {
             Istance = this;
-            Handler = new();
 
-            UncomplicatedCustomRoles.API.Features.Events.Listen(UCREvents.Spawned, Handler.OnSpawned);
-            UncomplicatedCustomRoles.API.Features.Events.Listen(UCREvents.Dying, Handler.OnDying);
-            UncomplicatedCustomRoles.API.Features.Events.Listen(UCREvents.Hurting, Handler.OnDamaging); 
-            UncomplicatedCustomRoles.API.Features.Events.Listen(UCREvents.InteractingElevator, Handler.OnInteractingElevator);
-            UncomplicatedCustomRoles.API.Features.Events.Listen(UCREvents.ActivatingWarheadPanel, Handler.OnWarheadActivation);
-            UncomplicatedCustomRoles.API.Features.Events.Listen(UCREvents.ActivatingGenerator, Handler.OnGeneratorActivation);
-            UncomplicatedCustomRoles.API.Features.Events.Listen(UCREvents.StoppingGenerator, Handler.OnGeneratorDeactivation);
-            UncomplicatedCustomRoles.API.Features.Events.Listen(UCREvents.TriggeringTesla, (ICustomRoleEvent Event) =>
+            foreach (KeyValuePair<int, Dictionary<UCREvents, BroadcastHint>> CustomRole in Config.Events)
             {
-                Event.IsAllowed = false;
-                return Event;
-            });
+                foreach (KeyValuePair<UCREvents, BroadcastHint> BroadcastHint in CustomRole.Value)
+                {
+                    Events.Listen(BroadcastHint.Key, (ICustomRoleEvent Event) =>
+                    {
+                        if (Event.Role.Id == CustomRole.Key)
+                        {
+                            IBroadcastHint EventBase = Config.Events[Event.Role.Id][Event.EventType];
+                            if (EventBase.BroadcastDuration > 0 && EventBase.BroadcastContent != string.Empty)
+                            {
+                                if (EventBase.BroadcastVisibility == BroadcastVisibility.All)
+                                {
+                                    Map.Broadcast(EventBase.BroadcastDuration, EventBase.BroadcastContent);
+                                }
+                                else
+                                {
+                                    Event.Player.Broadcast(EventBase.BroadcastDuration, EventBase.BroadcastContent);
+                                }
+                            }
+                            if (EventBase.HintDuration > 0 && EventBase.HintContent != string.Empty)
+                            {
+                                Event.Player.ShowHint(EventBase.HintContent, EventBase.HintDuration);
+                            }
+                            if (EventBase.CassieMessage != null && EventBase.CassieMessage != string.Empty)
+                            {
+                                if (EventBase.CassieSubtitles != null && EventBase.CassieSubtitles != string.Empty)
+                                {
+                                    Cassie.MessageTranslated(EventBase.CassieMessage, EventBase.CassieSubtitles);
+                                }
+                                else
+                                {
+                                    Cassie.Message(EventBase.CassieMessage);
+                                }
+                            }
+                        }
+                        return Event;
+                    });
+                }
+            }
 
             base.OnEnabled();
         }
         public override void OnDisabled()
         {
-            UncomplicatedCustomRoles.API.Features.Events.Unlisten(UCREvents.Spawned, Handler.OnSpawned);
-            UncomplicatedCustomRoles.API.Features.Events.Unlisten(UCREvents.Dying, Handler.OnDying);
-            UncomplicatedCustomRoles.API.Features.Events.Unlisten(UCREvents.Hurting, Handler.OnDamaging);
-            UncomplicatedCustomRoles.API.Features.Events.Unlisten(UCREvents.InteractingElevator, Handler.OnInteractingElevator);
-            UncomplicatedCustomRoles.API.Features.Events.Unlisten(UCREvents.ActivatingWarheadPanel, Handler.OnWarheadActivation);
-            UncomplicatedCustomRoles.API.Features.Events.Unlisten(UCREvents.ActivatingGenerator, Handler.OnGeneratorActivation);
-            UncomplicatedCustomRoles.API.Features.Events.Unlisten(UCREvents.StoppingGenerator, Handler.OnGeneratorDeactivation);
-            UncomplicatedCustomRoles.API.Features.Events.Unlisten(UCREvents.TriggeringTesla, (ICustomRoleEvent Event) =>
-            {
-                Event.IsAllowed = false;
-                return Event;
-            });
+            Events.ClearAllListeners();
 
             Istance = null;
-            Handler = null;
 
             base.OnDisabled();
         }
