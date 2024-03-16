@@ -13,7 +13,7 @@ namespace BroadcastHintExtension
         public override string Name => "BroadcastHintExtension";
         public override string Prefix => "BroadcastHintExtension";
         public override string Author => "FoxWorn3365";
-        public override Version Version => new(0, 8, 0);
+        public override Version Version => new(1, 0, 0);
         public override Version RequiredExiledVersion => new(8, 8, 0);
         public static Plugin Istance;
         public override void OnEnabled()
